@@ -3,38 +3,32 @@ import { SolicitudController } from './solicitud.controller';
 import { SolicitudService } from './solicitud.service';
 import { CreateSolicitudDto } from './dto/create-solicitud.dto';
 import { UpdateSolicitudDto } from './dto/update-solicitud.dto';
+import { SolicitudServiceMock } from './solicitud-service-mock';
 
 describe('SolicitudController', () => {
   let controller: SolicitudController;
-  let mockSolicitudService = {
-    create: jest.fn((dto) => {
-      return {
-        id: Math.random()* (1000-1)+1,
-        ... dto
-      }
-    }),
-    update: jest.fn((id, dto) => {
-      return {
-        id,
-        ... dto
-      }
-    })
-  }
+  let service: SolicitudService;
 
   beforeEach(async () => {
+    const SolicitudServiceProvider = {
+      provide: SolicitudService,
+      useClass: SolicitudServiceMock
+    }
+
     const module: TestingModule = await Test.createTestingModule({
       controllers: [SolicitudController],
-      providers: [SolicitudService],
-    }).overrideProvider(SolicitudService).useValue(mockSolicitudService).compile();
+      providers: [SolicitudService, SolicitudServiceProvider],
+    }).overrideProvider(SolicitudService).useClass(SolicitudServiceMock).compile();
 
     controller = module.get<SolicitudController>(SolicitudController);
+    service = module.get<SolicitudService>(SolicitudService);
   });
 
   it('should be defined', () => {
     expect(controller).toBeDefined();
   });
 
-  it('should create a solicitud', () => {
+  it('should create a solicitud', async () => {
     const createSolicitudDto : CreateSolicitudDto = {
       nombre: 'Jhon Doe',
       cargo: 'Desarrollador',
@@ -49,10 +43,10 @@ describe('SolicitudController', () => {
       horaInicio:'',
       horaFin:'',
     }
-  expect(controller.create(createSolicitudDto)).toEqual({id: expect.any(Number), ...createSolicitudDto})
+  expect(await controller.create(createSolicitudDto)).toEqual({id: expect.any(Number), ...createSolicitudDto})
   })
 
-  it('should update a solicitud', () => {
+  it('should update a solicitud', async () => {
     const updateSolicitudDto : UpdateSolicitudDto = {
       nombre: 'Jhon Calle',
       cargo: 'Desarrollador',
@@ -68,7 +62,9 @@ describe('SolicitudController', () => {
       horaFin:''
   }
   const solicitudId = '2';
-  expect(controller.update(solicitudId, updateSolicitudDto)).toEqual({id: +solicitudId, ...updateSolicitudDto});
-  expect(mockSolicitudService.update).toHaveBeenCalledWith(+solicitudId, updateSolicitudDto);
+  expect(await controller.update(solicitudId, updateSolicitudDto)).toEqual({id: +solicitudId, ...updateSolicitudDto});
+  const updateSpy = jest.spyOn(service, 'update');
+  controller.update(solicitudId, updateSolicitudDto);
+  expect(updateSpy).toHaveBeenCalledWith(+solicitudId, updateSolicitudDto);
 })
 });
