@@ -4,12 +4,13 @@ import { SolicitudService } from './solicitud.service';
 
 describe('SolicitudController', () => {
   let controller: SolicitudController;
+  let mockSolicitudService = {}
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [SolicitudController],
       providers: [SolicitudService],
-    }).compile();
+    }).overrideProvider(SolicitudService).useValue(mockSolicitudService).compile();
 
     controller = module.get<SolicitudController>(SolicitudController);
   });
