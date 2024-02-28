@@ -26,7 +26,7 @@ export class EspacioService {
     id: number,
     updateEspacioDto: UpdateEspacioDto,
   ): Promise<Espacio> {
-    let toUpdate = await this.espacioRepository.findOne(id);
+    let toUpdate = await this.espacioRepository.findOneBy({id:id});
 
     let updated = Object.assign(toUpdate, updateEspacioDto);
 

@@ -19,14 +19,14 @@ export class ReservaService {
   }
 
   async findOne(id: number): Promise<Reserva> {
-    return await this.reservaRepository.findOne(id);
+    return await this.reservaRepository.findOneBy({id:id});
   }
 
   async update(
     id: number,
     updateReservaDto: UpdateReservaDto,
   ): Promise<Reserva> {
-    let toUpdate = await this.reservaRepository.findOne(id);
+    let toUpdate = await this.reservaRepository.findOneBy({id:id});
 
     let updated = Object.assign(toUpdate, updateReservaDto);
 
