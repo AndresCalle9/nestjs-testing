@@ -20,14 +20,14 @@ export class SolicitudService {
   }
 
   async findOne(id: number): Promise<Solicitud> {
-    return await this.solicitudRepository.findOneBy({id:id});
+    return await this.solicitudRepository.findOne({where:{id:id}});
   }
 
   async update(
     id: number,
     updateSolicitudDto: UpdateSolicitudDto,
   ): Promise<Solicitud> {
-    let toUpdate = await this.solicitudRepository.findOneBy({id:id});
+    let toUpdate = await this.solicitudRepository.findOne({where:{id:id}});
 
     let updated = Object.assign(toUpdate, updateSolicitudDto);
 

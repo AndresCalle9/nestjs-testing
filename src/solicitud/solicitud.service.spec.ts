@@ -3,20 +3,17 @@ import { SolicitudService } from './solicitud.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Solicitud } from './entities/solicitud.entity';
 import { CreateSolicitudDto } from './dto/create-solicitud.dto';
+import { UpdateSolicitudDto } from './dto/update-solicitud.dto';
+import { SolicitudRepositoryMock } from './solicitud-repository-mock';
 
 describe('SolicitudService', () => {
   let service: SolicitudService;
-  let mockSolicitudRepository = {
-    save: jest.fn().mockImplementation((dto) => {
-      return {id: Math.floor(Math.random() * 100), ...dto}
-    }),
-  }
-
+  
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [SolicitudService,{
         provide: getRepositoryToken(Solicitud),
-        useValue: mockSolicitudRepository
+        useClass: SolicitudRepositoryMock
       }],
     }).compile();
 
@@ -44,5 +41,24 @@ describe('SolicitudService', () => {
     }
 
     expect(await service.create(createSolicitudDto)).toEqual({id: expect.any(Number), ...createSolicitudDto})
+  })
+
+  it('should update a solicitud', async () => {
+    const updateSolicitudDto: UpdateSolicitudDto = {
+      nombre: 'John Smith',
+      cargo: 'Assistant Professor',
+      unidad: 'Informatics Department',
+      telefono: '1234',
+      email: 'john.doe@gmail.com',
+      tipo: '',
+      nombreActividad: '',
+      start: undefined,
+      end: undefined,
+      dia: '',
+      horaInicio: '',
+      horaFin: '',
+    }
+    const solicitudId = 1;
+    expect(await service.update(solicitudId, updateSolicitudDto)).toEqual({id: {where:{id:solicitudId}}, ...updateSolicitudDto})
   })
 });
